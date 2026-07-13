@@ -17,6 +17,11 @@ from recomart.feature_store.store import (
     materialize_feature_store,
     retrieve_features,
 )
+from recomart.models.recommender import (
+    recommend_products,
+    train_recommender,
+)
+
 
 def run_ingestion(
     config: ProjectConfig,
@@ -162,4 +167,49 @@ def get_user_features(
         key_values={"user_id": user_id},
         consumer=consumer,
         version="v1",
+    )
+
+def run_model_training(
+    config: ProjectConfig,
+    logger: logging.Logger,
+    rank: int,
+    top_k: int,
+    seed: int,
+) -> dict[str, Any]:
+    """Run Task 9 collaborative-model training and evaluation."""
+    return train_recommender(
+        config=config,
+        logger=logger,
+        rank=rank,
+        top_k=top_k,
+        seed=seed,
+    )
+
+
+def get_recommendations(
+    config: ProjectConfig,
+    user_id: int,
+    limit: int,
+) -> dict[str, Any]:
+    """Return a Top-K recommendation inference response."""
+    return recommend_products(
+        config=config,
+        user_id=user_id,
+        limit=limit,
+    )
+
+def run_orchestration(
+    skip_ingestion: bool,
+    rank: int,
+    top_k: int,
+    seed: int,
+) -> dict[str, Any]:
+    """Run the Prefect-managed end-to-end workflow."""
+    from recomart.orchestration.prefect_flow import run_recomart_flow
+
+    return run_recomart_flow(
+        skip_ingestion=skip_ingestion,
+        rank=rank,
+        top_k=top_k,
+        seed=seed,
     )

@@ -1,0 +1,6 @@
+outs:
+- md5: 4d0059452902e8322b47274ed81a46e0.dir
+  size: 102886
+  nfiles: 4
+  hash: md5
+  path: orchestration

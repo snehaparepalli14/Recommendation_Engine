@@ -9,9 +9,9 @@ stages:
       size: 334
     - path: data\raw
       hash: md5
-      md5: 42a3725e1769a44b820073b580ac57c4.dir
-      size: 5785841
-      nfiles: 26
+      md5: f166a3282c201f51f50b0525c532dd5c.dir
+      size: 6943009
+      nfiles: 31
     - path: src\recomart\validation
       hash: md5
       md5: 89601d0023544852b227c1afe535ddc4.dir
@@ -26,9 +26,9 @@ stages:
       size: 334
     - path: data\prepared
       hash: md5
-      md5: 27ac1df3c732db0e27db60aeb97e698b.dir
-      size: 4478161
-      nfiles: 17
+      md5: af5364ae799c88356a910c19f096627d.dir
+      size: 10075861
+      nfiles: 37
     - path: src\recomart\preparation
       hash: md5
       md5: e13d0af35d703c030372ca7c28744eea.dir
@@ -43,9 +43,9 @@ stages:
       size: 334
     - path: data\processed
       hash: md5
-      md5: 91a22587a79c1cd0ff67e823a6cc429b.dir
-      size: 853918
-      nfiles: 49
+      md5: ffd5e619c1c6aed0ff72c032713035c7.dir
+      size: 1500358
+      nfiles: 84
     - path: src\recomart\features
       hash: md5
       md5: dab137fc851f6c2a1ba54621ecfb0428.dir
@@ -60,11 +60,28 @@ stages:
       size: 334
     - path: data\warehouse
       hash: md5
-      md5: f083d52c4ebbc7756a0902c0bc01c1f4.dir
-      size: 6041600
+      md5: c5063d8f6794ee9eb538c62cdf42637a.dir
+      size: 7876608
       nfiles: 1
     - path: src\recomart\feature_store
       hash: md5
       md5: f613e82b6c14ea949dad4ecbd4710180.dir
       size: 21455
+      nfiles: 4
+  train_model:
+    cmd: .\.venv\Scripts\python.exe -m recomart train-model --rank 12 --top-k 10
+    deps:
+    - path: config\project.json
+      hash: md5
+      md5: 87971fe76c7d3cf9e61aa49d115a8702
+      size: 334
+    - path: data\feature_store
+      hash: md5
+      md5: 80cc5dd3892de7157fb8caf7b8499ed4.dir
+      size: 2374402
+      nfiles: 2
+    - path: src\recomart\models
+      hash: md5
+      md5: a27879c22c3c0d5add8ab6ee20a0b9c9.dir
+      size: 38351
       nfiles: 4

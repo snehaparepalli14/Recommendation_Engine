@@ -1,0 +1,8 @@
+event_id,user_id,product_id,event_type,event_timestamp,session_id
+evt-0001,1,1,view,2026-07-01T09:00:00Z,s-001
+evt-0002,1,1,click,2026-07-01T09:01:10Z,s-001
+evt-0003,1,1,purchase,2026-07-01T09:05:00Z,s-001
+evt-0004,2,2,view,2026-07-01T10:00:00Z,s-002
+evt-0005,2,2,cart,2026-07-01T10:02:00Z,s-002
+evt-0006,3,7,view,2026-07-02T08:10:00Z,s-003
+

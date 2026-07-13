@@ -1,0 +1,6 @@
+outs:
+- md5: e8983b28631b8d2968005daaa5e20c70.dir
+  size: 84651
+  nfiles: 7
+  hash: md5
+  path: model_evaluation

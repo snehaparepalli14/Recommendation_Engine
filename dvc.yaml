@@ -23,3 +23,10 @@ stages:
     - config\project.json
     - data\warehouse
     - src\recomart\feature_store
+
+  train_model:
+    cmd: .\.venv\Scripts\python.exe -m recomart train-model --rank 12 --top-k 10
+    deps:
+    - config\project.json
+    - data\feature_store
+    - src\recomart\models

@@ -1,0 +1,6 @@
+outs:
+- md5: 50f2cf6162439b931c915e0d1dfac3f2.dir
+  size: 227262
+  nfiles: 18
+  hash: md5
+  path: data_quality

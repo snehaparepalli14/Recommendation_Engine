@@ -15,6 +15,17 @@ from recomart.pipeline import (
     run_features,
     get_user_features,
     run_feature_store,
+    run_orchestration,
+)
+from recomart.pipeline import (
+    get_recommendations,
+    get_user_features,
+    run_feature_store,
+    run_features,
+    run_ingestion,
+    run_model_training,
+    run_preparation_eda,
+    run_validation,
 )
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -25,7 +36,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser.add_argument(
         "command",
-        choices=["ingest-all","validate-all","prepare-eda","build-features","materialize-feature-store","get-user-features",],
+        choices=["ingest-all","validate-all","prepare-eda","build-features","materialize-feature-store","get-user-features","train-model","recommend","orchestrate-all",],
         help="Pipeline command to execute",
     )
 
@@ -34,6 +45,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--consumer",
         choices=["training", "inference"],
         default="inference",
+    )
+    parser.add_argument("--rank", type=int, default=12)
+    parser.add_argument("--top-k", type=int, default=10)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--limit", type=int, default=10)
+    parser.add_argument(
+    "--skip-ingestion",
+    action="store_true",
+    help="Reuse existing raw snapshots instead of calling sources again.",
     )
 
     args = parser.parse_args(argv)
@@ -76,5 +96,36 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(json.dumps(result, indent=2, default=str))
         return 0
     
+    if args.command == "train-model":
+        result = run_model_training(
+            config=config,
+            logger=logger,
+            rank=args.rank,
+            top_k=args.top_k,
+            seed=args.seed,
+        )
+        print(json.dumps(result, indent=2))
+        return 0
 
+    if args.command == "recommend":
+        if args.user_id is None:
+            parser.error("--user-id is required for recommend")
+
+        result = get_recommendations(
+            config=config,
+            user_id=args.user_id,
+            limit=args.limit,
+        )
+        print(json.dumps(result, indent=2))
+        return 0
+    
+    if args.command == "orchestrate-all":
+        result = run_orchestration(
+            skip_ingestion=args.skip_ingestion,
+            rank=args.rank,
+            top_k=args.top_k,
+            seed=args.seed,
+        )
+        print(json.dumps(result, indent=2))
+        return 0
     return 2

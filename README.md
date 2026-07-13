@@ -1,162 +1,112 @@
 # RecoMart Data Management Pipeline
 
-Original implementation for the **Data Management for Machine Learning - Assignment I**.
+Original implementation for the Data Management for Machine Learning assignment.
 
-RecoMart is an e-commerce recommendation-system use case. The pipeline prepares reliable product, user, cart, and clickstream data for personalised Top-10 product recommendations.
+RecoMart is an e-commerce recommendation use case. The project turns product, user, cart, and clickstream data into a validated, versioned, feature-managed pipeline that trains and serves personalised Top-10 product recommendations.
 
 ## Business problem
 
-RecoMart needs to improve user engagement and cross-selling by recommending products based on product attributes and observed user behaviour.
+RecoMart wants to improve customer engagement and cross-selling through product recommendations based on user behaviour and product interactions.
 
-Pipeline outputs:
+Expected outputs:
 
-- Clean datasets for EDA
-- Engineered recommendation features
+- Clean datasets and EDA artefacts
+- Warehouse features for collaborative recommendation
 - Versioned feature retrieval for training and inference
-- Future recommendation model and inference interface
+- Trained recommender model and Top-K inference interface
+- Reproducible, monitored end-to-end execution
 
-Planned model metrics:
-
-- Precision@10
-- Recall@10
-- NDCG@10
-- Catalog coverage
+Evaluation metrics are Precision@10, Recall@10, NDCG@10, and catalogue coverage.
 
 ## Data sources
 
-- **DummyJSON REST API**
-  - Products: `https://dummyjson.com/products?limit=0`
-  - Users: `https://dummyjson.com/users?limit=0`
-  - Carts: `https://dummyjson.com/carts?limit=0`
-- **Local CSV**
-  - Simulated clickstream events: `data/input/clickstream.csv`
+- DummyJSON REST API: products, users, and carts
+- Local CSV: simulated clickstream events
 
-DummyJSON is cited as the demonstration data source. The project code, architecture, transformations, and documentation are original to this assignment.
+The project architecture, processing logic, source code, model, and documentation were created specifically for this assignment.
 
-## Stage 1: ingestion and raw storage
+## Implemented pipeline
 
-Implemented:
+| Assignment task | Implementation |
+|---|---|
+| 1. Problem formulation | RecoMart recommendation objective, sources, outputs, and metrics |
+| 2. Ingestion | DummyJSON REST API and clickstream CSV ingestion with retries, logs, and manifests |
+| 3. Raw storage | Immutable timestamped snapshots with SHA-256 checksums |
+| 4. Validation | Profiling, validation, prepared/quarantine routing, JSON/PDF reports |
+| 5. Preparation and EDA | Cleaning, encoding, normalisation, Parquet outputs, seven plots |
+| 6. Feature engineering | DuckDB warehouse, dimensions, facts, activity, popularity, and co-occurrence features |
+| 7. Feature store | Versioned DuckDB feature views with a JSON registry |
+| 8. Versioning and lineage | Git, DVC data versions, reproducible stages, and lockfile |
+| 9. Model training | Truncated-SVD collaborative filtering, Top-K evaluation, and JSON experiment tracking |
+| 10. Orchestration | Prefect flow with ordered tasks, retries, monitoring, logs, and execution summaries |
 
-- REST ingestion for products, users, and carts
-- CSV ingestion for clickstream events
-- Configurable timeout and three retry attempts with exponential backoff
-- Error handling, logs, run manifests, and checksums
-- Immutable timestamped raw snapshots partitioned by source, entity, and ingestion date
+## Commands
 
 ```powershell
 $env:PYTHONPATH = "src"
+
 python -m recomart ingest-all
-```
-
-## Stage 2: profiling and validation
-
-Implemented:
-
-- Missing-value, duplicate, schema/type, range, format, and relationship checks
-- Valid records routed to `data/prepared/`
-- Invalid records routed to `data/quarantine/` with source-row and rule evidence
-- JSON and PDF data-quality reports
-
-```powershell
-$env:PYTHONPATH = "src"
 python -m recomart validate-all
-```
-
-## Stage 3: preparation and EDA
-
-Implemented:
-
-- Nested product dimensions and cart products flattened
-- Categorical codes and min-max normalised numeric values
-- Sensitive fields such as passwords, SSNs, bank, and crypto data excluded
-- Sparse user-product interactions; unobserved pairs treated as implicit zero-feedback
-- Parquet outputs, EDA summary, and seven plots
-
-```powershell
-$env:PYTHONPATH = "src"
 python -m recomart prepare-eda
-```
-
-## Stage 4: warehouse and feature engineering
-
-The latest Stage 3 Parquet files are loaded into a local DuckDB warehouse.
-
-Implemented:
-
-- User and product dimensions
-- Cart, cart-item, event, and interaction facts
-- User activity features
-- Product popularity features
-- Weighted user-product implicit-feedback scores
-- Cart-based product co-occurrence features
-- SQL schema and feature metadata
-
-```powershell
-$env:PYTHONPATH = "src"
 python -m recomart build-features
+python -m recomart materialize-feature-store
+
+python -m recomart get-user-features --user-id 1 --consumer inference
+python -m recomart train-model --rank 12 --top-k 10
+python -m recomart recommend --user-id 1 --limit 10
+
+python -m dvc status
+python -m unittest discover -s tests -v
 ```
 
-## Stage 5: versioned feature store
+## Orchestration
 
-A custom DuckDB feature store copies Stage 4 features into versioned feature views. A JSON registry records the feature names, entity keys, sources, descriptions, row counts, and version.
+Start the local Prefect server in one terminal:
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m recomart materialize-feature-store
-python -m recomart get-user-features --user-id 1 --consumer inference
+prefect server start
 ```
 
-Training and inference must request the same feature-view name and version. This prevents train-serving mismatch.
+In a second activated project terminal:
+
+```powershell
+$env:PREFECT_API_URL = "http://127.0.0.1:4200/api"
+python -m recomart orchestrate-all --skip-ingestion
+```
+
+Open `http://127.0.0.1:4200` to view flow runs, task states, logs, durations, and retries.
+
+## Current evidence
+
+- 194 products, 208 users, 208 carts, and 6 clickstream events validated
+- 800 cart items and 806 user-product interactions prepared
+- User-item matrix sparsity: 98.0398%
+- Warehouse: 208 user rows, 194 product rows, 791 user-product rows, and 1,277 co-occurrence rows
+- Feature-store version: `v1`
+- SVD evaluation: Precision@10 = 0.0082, Recall@10 = 0.0817, NDCG@10 = 0.0367, catalogue coverage = 0.6443
+- Prefect monitoring: successful flow and task runs with no failed or crashed runs
+- Automated tests: 19 passing
+- DVC: data and pipelines up to date
 
 ## Project structure
 
 ```text
-config/                         Project settings
-data/input/                     Source clickstream CSV
-data/raw/                       Immutable Stage 1 snapshots
-data/prepared/                  Validated Stage 2 records
-data/quarantine/                Rejected records and validation evidence
-data/processed/                 Stage 3 Parquet datasets
-data/warehouse/                 Stage 4 DuckDB warehouse
-data/feature_store/             Stage 5 feature-store database and registry
-docs/                           Architecture, traceability, and SQL schema
-logs/                           Pipeline execution logs
-reports/data_quality/           Stage 2 JSON and PDF reports
-reports/eda/                    Stage 3 EDA charts and summary
-reports/features/               Stage 4 feature summaries
-src/recomart/                   Application source code
-tests/                          Automated tests
+config/                     Project configuration
+data/input/                 Clickstream source CSV
+data/raw/                   Immutable raw snapshots
+data/prepared/              Validated records
+data/quarantine/            Invalid records and error evidence
+data/processed/             Cleaned Parquet datasets
+data/warehouse/             DuckDB warehouse
+data/feature_store/         Versioned feature views and registry
+models/                     Trained SVD model and registry
+reports/                    Quality, EDA, feature, model, experiment, and orchestration evidence
+docs/                       Architecture, lineage, traceability, and SQL schema
+src/recomart/               Modular pipeline source code
+tests/                      Automated tests
+dvc.yaml / dvc.lock         Reproducible data lineage
 ```
 
-## Run all tests
+## Limitations and future scope
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests -v
-```
-
-## Current evidence
-
-- 194 products, 208 users, 208 carts, and 6 clickstream events ingested and validated
-- 800 cart items and 806 user-product interactions prepared
-- User-item matrix sparsity: 98.0398%
-- Warehouse: 208 user feature rows, 194 product feature rows, 791 user-product rows, and 1,277 co-occurrence rows
-- Feature-store registry version: `v1`
-- Automated tests: 16 passing
-
-## Next stages
-
-- Data versioning and lineage
-- Recommendation model training and evaluation
-- Pipeline orchestration, monitoring, and scheduling
-- Final PDF report and demo video
-
-## Stage 6: data versioning and lineage
-
-Git and DVC version the data lifecycle without committing large data files to Git. DVC tracks the raw, prepared, quarantine, processed, warehouse, and feature-store directories; `dvc.yaml` and `dvc.lock` record the reproducible transformation graph.
-
-```powershell
-$env:PYTHONPATH = "src"
-python -m dvc status
-python -m dvc dag
-```
+The current dataset is sparse and mostly contains simulated cart interactions. More real clickstream events, purchases, timestamps, and explicit ratings would improve the recommendation model. Future work can compare SVD against content-based and hybrid recommenders, tune hyperparameters, schedule Prefect deployments, and publish a production inference API.

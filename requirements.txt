@@ -4,3 +4,5 @@ pyarrow>=25,<26
 matplotlib>=3.8,<4
 duckdb>=1.5,<2
 dvc>=3.67,<4
+numpy>=2.0,<3
+prefect>=3.7,<4

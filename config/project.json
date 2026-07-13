@@ -1,0 +1,14 @@
+{
+  "project_name": "recomart",
+  "api_base_url": "https://dummyjson.com",
+  "api_timeout_seconds": 20,
+  "api_max_attempts": 3,
+  "api_backoff_seconds": 1.0,
+  "resources": {
+    "products": "/products?limit=0",
+    "users": "/users?limit=0",
+    "carts": "/carts?limit=0"
+  },
+  "clickstream_input": "data/input/clickstream.csv"
+}
+

@@ -1,0 +1,6 @@
+reportlab>=4.0,<5
+pandas>=2.2,<3
+pyarrow>=25,<26
+matplotlib>=3.8,<4
+duckdb>=1.5,<2
+dvc>=3.67,<4

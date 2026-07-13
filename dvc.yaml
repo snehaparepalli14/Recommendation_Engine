@@ -1,0 +1,25 @@
+stages:
+  validate:
+    cmd: .\.venv\Scripts\python.exe -m recomart validate-all
+    deps:
+    - config\project.json
+    - data\raw
+    - src\recomart\validation
+  prepare_eda:
+    cmd: .\.venv\Scripts\python.exe -m recomart prepare-eda
+    deps:
+    - config\project.json
+    - data\prepared
+    - src\recomart\preparation
+  build_features:
+    cmd: .\.venv\Scripts\python.exe -m recomart build-features
+    deps:
+    - config\project.json
+    - data\processed
+    - src\recomart\features
+  materialize_feature_store:
+    cmd: .\.venv\Scripts\python.exe -m recomart materialize-feature-store
+    deps:
+    - config\project.json
+    - data\warehouse
+    - src\recomart\feature_store

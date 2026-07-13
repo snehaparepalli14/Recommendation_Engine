@@ -1,0 +1,70 @@
+schema: '2.0'
+stages:
+  validate:
+    cmd: .\.venv\Scripts\python.exe -m recomart validate-all
+    deps:
+    - path: config\project.json
+      hash: md5
+      md5: 87971fe76c7d3cf9e61aa49d115a8702
+      size: 334
+    - path: data\raw
+      hash: md5
+      md5: 42a3725e1769a44b820073b580ac57c4.dir
+      size: 5785841
+      nfiles: 26
+    - path: src\recomart\validation
+      hash: md5
+      md5: 89601d0023544852b227c1afe535ddc4.dir
+      size: 70997
+      nfiles: 6
+  prepare_eda:
+    cmd: .\.venv\Scripts\python.exe -m recomart prepare-eda
+    deps:
+    - path: config\project.json
+      hash: md5
+      md5: 87971fe76c7d3cf9e61aa49d115a8702
+      size: 334
+    - path: data\prepared
+      hash: md5
+      md5: 27ac1df3c732db0e27db60aeb97e698b.dir
+      size: 4478161
+      nfiles: 17
+    - path: src\recomart\preparation
+      hash: md5
+      md5: e13d0af35d703c030372ca7c28744eea.dir
+      size: 44840
+      nfiles: 4
+  build_features:
+    cmd: .\.venv\Scripts\python.exe -m recomart build-features
+    deps:
+    - path: config\project.json
+      hash: md5
+      md5: 87971fe76c7d3cf9e61aa49d115a8702
+      size: 334
+    - path: data\processed
+      hash: md5
+      md5: 91a22587a79c1cd0ff67e823a6cc429b.dir
+      size: 853918
+      nfiles: 49
+    - path: src\recomart\features
+      hash: md5
+      md5: dab137fc851f6c2a1ba54621ecfb0428.dir
+      size: 22762
+      nfiles: 4
+  materialize_feature_store:
+    cmd: .\.venv\Scripts\python.exe -m recomart materialize-feature-store
+    deps:
+    - path: config\project.json
+      hash: md5
+      md5: 87971fe76c7d3cf9e61aa49d115a8702
+      size: 334
+    - path: data\warehouse
+      hash: md5
+      md5: f083d52c4ebbc7756a0902c0bc01c1f4.dir
+      size: 6041600
+      nfiles: 1
+    - path: src\recomart\feature_store
+      hash: md5
+      md5: f613e82b6c14ea949dad4ecbd4710180.dir
+      size: 21455
+      nfiles: 4

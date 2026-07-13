@@ -1,0 +1,2 @@
+[console_scripts]
+recomart = recomart.cli:main

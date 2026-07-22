@@ -40,6 +40,11 @@ The project architecture, processing logic, source code, model, and documentatio
 | 9. Model training | Truncated-SVD collaborative filtering, Top-K evaluation, and JSON experiment tracking |
 | 10. Orchestration | Prefect flow with ordered tasks, retries, monitoring, logs, and execution summaries |
 
+## prerequisite
+```
+pip install -r requirements.txt   
+```
+
 ## Commands
 
 ```powershell
